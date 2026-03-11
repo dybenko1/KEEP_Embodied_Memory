@@ -1,0 +1,586 @@
+"""Attention layer with xFormers and PagedAttention."""
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple, Type
+
+import torch
+from xformers import ops as xops
+from xformers.ops.fmha.attn_bias import (AttentionBias,
+                                         BlockDiagonalCausalMask,
+                                         LowerTriangularMaskWithTensorBias,
+                                         LowerTriangularFromBottomRightMask)
+
+from vllm.attention.backends.abstract import (AttentionBackend, AttentionImpl,
+                                              AttentionMetadata,
+                                              AttentionMetadataPerStage)
+from vllm.attention.ops.paged_attn import (PagedAttention,
+                                           PagedAttentionMetadata)
+from vllm.logger import init_logger
+from torch import nn
+import math
+
+logger = init_logger(__name__)
+decide_skill = False
+
+class XFormersBackend(AttentionBackend):
+
+    @staticmethod
+    def get_impl_cls() -> Type["XFormersImpl"]:
+        return XFormersImpl
+
+    @staticmethod
+    def make_metadata(*args, **kwargs) -> "XFormersMetadata":
+        return XFormersMetadata(*args, **kwargs)
+
+    @staticmethod
+    def get_kv_cache_shape(
+        num_blocks: int,
+        block_size: int,
+        num_kv_heads: int,
+        head_size: int,
+    ) -> Tuple[int, ...]:
+        return PagedAttention.get_kv_cache_shape(num_blocks, block_size,
+                                                 num_kv_heads, head_size)
+
+    @staticmethod
+    def swap_blocks(
+        src_kv_cache: torch.Tensor,
+        dst_kv_cache: torch.Tensor,
+        src_to_dst: Dict[int, int],
+    ) -> None:
+        PagedAttention.swap_blocks(src_kv_cache, dst_kv_cache, src_to_dst)
+
+    @staticmethod
+    def copy_blocks(
+        kv_caches: List[torch.Tensor],
+        src_to_dists: Dict[int, List[int]],
+    ) -> None:
+        PagedAttention.copy_blocks(kv_caches, src_to_dists)
+
+
+@dataclass
+class XFormersMetadata(AttentionMetadataPerStage, PagedAttentionMetadata):
+    """Metadata for XFormersbackend.
+
+    NOTE: Any python object stored here is not updated when it is
+    cuda-graph replayed. If you have values that need to be changed
+    dynamically, it should be stored in tensor. The tensor has to be
+    updated from `CUDAGraphRunner.forward` API.
+    """
+    # Currently, input sequences can only contain all prompts
+    # or all decoding. True if all sequences are prompts.
+    is_prompt: bool
+    # (batch_size,). The prompt length per sequence. None if it is a decoding.
+    prompt_lens: Optional[List[int]]
+    # prompt_lens stored as a tensor.
+    prompt_lens_tensor: Optional[torch.Tensor]
+
+    # NOTE(sang): Definition of context_len, subquery_len, and seqlen.
+    # |---------- N-1 iteration --------|
+    # |---------------- N iteration ---------------------|
+    # |- tokenA -|......................|-- newTokens ---|
+    # |---------- context_len ----------|
+    # |-------------------- seqlen ----------------------|
+    #                                   |- subquery_len -|
+
+    # WARNING(sang): context_len has different definition depending on if it is
+    # prefill vs decoding. When it is prefill, it doesn't include new tokens.
+    # When it is for decoding, it includes a new token.
+
+    # Maximum subquery length in the batch.
+    max_subquery_len: Optional[int]
+    # FIXME: It is for flash attn.
+    # Maximum prompt length in the batch.
+    max_prompt_len: Optional[int]
+    # (batch_size + 1,). The cumulative subquery lengths of the sequences in
+    # the batch, used to index into subquery. E.g., if the subquery length
+    # is [4, 6], it is [0, 4, 10].
+    subquery_start_loc: Optional[torch.Tensor]
+    # FIXME: It is for flash attn.
+    # (batch_size + 1,). The cumulative sequence lengths of the sequences in
+    # the batch, used to index into sequence. E.g., if the sequence length is
+    # [4, 6], it is [0, 4, 10].
+    seq_start_loc: Optional[torch.Tensor]
+
+    # Whether or not if cuda graph is enabled.
+    # Cuda-graph is currently enabled for decoding only.
+    # TODO(woosuk): Move `use_cuda_graph` out since it's unrelated to attention.
+    use_cuda_graph: bool
+
+    def __post_init__(self):
+        # Set during the execution of the first attention op.
+        # It is a list because it is needed to set per prompt
+        # when alibi slopes is used. It is because of the limitation
+        # from xformer API.
+        # will not appear in the __repr__ and __init__
+        self.attn_bias: Optional[List[AttentionBias]] = None
+
+
+class XFormersImpl(AttentionImpl):
+    """
+    If the input tensors contain prompt tokens, the layout is as follows:
+    |<--------------- num_prefill_tokens ----------------->|	
+    |<--prefill_0-->|<--prefill_1-->|...|<--prefill_N-1--->|
+
+    Otherwise, the layout is as follows:	
+    |<----------------- num_decode_tokens ------------------>|	
+    |<--decode_0-->|..........|<--decode_M-1-->|<--padding-->|
+
+    Generation tokens can contain padding when cuda-graph is used.
+    Currently, prompt tokens don't contain any padding.
+
+    The prompts might have different lengths, while the generation tokens
+    always have length 1.
+
+    If chunked prefill is enabled, prefill tokens and decode tokens can be
+    batched together in a flattened 1D query.
+
+    |<----- num_prefill_tokens ---->|<------- num_decode_tokens --------->|
+    |<-prefill_0->|...|<-prefill_N-1->|<--decode_0-->|...|<--decode_M-1-->|
+
+    Currently, cuda graph is disabled for chunked prefill, meaning there's no
+    padding between prefill and decode tokens.
+    """
+
+    def __init__(
+        self,
+        num_heads: int,
+        head_size: int,
+        scale: float,
+        num_kv_heads: Optional[int] = None,
+        alibi_slopes: Optional[List[float]] = None,
+        sliding_window: Optional[int] = None,
+    ) -> None:
+        self.num_heads = num_heads
+        self.head_size = head_size
+        self.scale = float(scale)
+        self.num_kv_heads = num_heads if num_kv_heads is None else num_kv_heads
+        self.sliding_window = sliding_window
+        if alibi_slopes is not None:
+            alibi_slopes = torch.tensor(alibi_slopes, dtype=torch.float32)
+        self.alibi_slopes = alibi_slopes
+
+        assert self.num_heads % self.num_kv_heads == 0
+        self.num_queries_per_kv = self.num_heads // self.num_kv_heads
+        self.recompute_modules = None
+        self.query_module_length = None
+
+        suppored_head_sizes = PagedAttention.get_supported_head_sizes()
+        if head_size not in suppored_head_sizes:
+            raise ValueError(
+                f"Head size {head_size} is not supported by PagedAttention. "
+                f"Supported head sizes are: {suppored_head_sizes}.")
+        self.key_value_hack = None
+        self.attention_weights = None
+        self.flag = 0
+
+    def forward(
+        self,
+        query: torch.Tensor,
+        key: torch.Tensor,
+        value: torch.Tensor,
+        kv_cache: Optional[torch.Tensor],
+        attn_metadata: AttentionMetadata[XFormersMetadata],
+        kv_scale: float,
+        
+        status: int,
+        cache_fuse_metadata: dict,
+        old_kv,
+    ) -> torch.Tensor:
+        """Forward pass with xFormers and PagedAttention.
+
+        Args:
+            query: shape = [num_tokens, num_heads * head_size]
+            key: shape = [num_tokens, num_kv_heads * head_size]
+            value: shape = [num_tokens, num_kv_heads * head_size]
+            kv_cache = [2, num_blocks, block_size * num_kv_heads * head_size]
+            attn_metadata: Metadata for attention.
+        Returns:
+            shape = [num_tokens, num_heads * head_size]
+        """
+        global decide_skill
+        query = query.view(-1, self.num_heads, self.head_size)
+        key = key.view(-1, self.num_kv_heads, self.head_size)
+        value = value.view(-1, self.num_kv_heads, self.head_size)
+
+        decide_skill = False
+        if not cache_fuse_metadata["check"] and old_kv[0] is not None:
+            decide_skill = True
+
+        if status in [5, 1, 2, 3, 4] or decide_skill:
+            key_old = old_kv[0].view(-1, self.num_kv_heads, self.head_size)
+            value_old = old_kv[1].view(-1, self.num_kv_heads, self.head_size)
+
+        if status in [5,1,3,2,4]:
+            attn_bias = LowerTriangularFromBottomRightMask()
+            cache_fuse_metadata["attn_bias"] = attn_bias
+            attn_metadata.prefill_metadata.attn_bias=None
+            
+
+        last_len = cache_fuse_metadata['suffix_len']
+        cache_fuse_metadata["kv_cache_dtype"] = value.dtype
+        
+        if status in [5,1,2,3,4]:
+            imp_indices = cache_fuse_metadata["imp_indices"]
+            # try:
+            key_old[imp_indices] = key[:-last_len]
+            value_old[imp_indices] = value[:-last_len]
+            key_old = torch.cat((key_old, key[-last_len:]), dim=0)
+            value_old = torch.cat((value_old, value[-last_len:]), dim=0)
+            key = key_old
+            value = value_old
+            self.key_value_hack = [key, value]
+        
+        if decide_skill:
+            # 保证 prefix KV 与当前 key/value 同 device、dtype，并连续，避免拼接或后续计算出错
+            key_old = key_old.to(device=key.device, dtype=key.dtype).contiguous()
+            value_old = value_old.to(device=value.device, dtype=value.dtype).contiguous()
+            # 正确顺序：prefix 在前，skill 在后，这样 position 0..prefix_len-1 是前缀
+            key = torch.cat((key_old, key), dim=0)
+            value = torch.cat((value_old, value), dim=0)
+            # skill 之间互不可见，每个 skill 内部是因果注意力：query 只看 prefix + 本 skill 内之前的 token
+            prefix_len = key_old.shape[0]
+            num_prefill = key.shape[0] - prefix_len
+            prefill_meta = getattr(attn_metadata, 'prefill_metadata', None)
+            prompt_lens = (getattr(prefill_meta, 'prompt_lens', None) if prefill_meta else None) or [num_prefill]
+            cum = [0]
+            for L in prompt_lens:
+                cum.append(cum[-1] + L)
+            if len(cum) == 1:
+                cum.append(num_prefill)
+            mask = torch.full(
+                (1, 1, num_prefill, prefix_len + num_prefill),
+                float('-inf'),
+                device=query.device,
+                dtype=query.dtype,
+            )
+            # 若 prompt_lens 总和与 num_prefill 不一致，退化为「整段因果」避免越界
+            use_block_causal = len(cum) > 1 and sum(prompt_lens) == num_prefill
+            for q in range(num_prefill):
+                mask[0, 0, q, :prefix_len] = 0
+                if use_block_causal:
+                    try:
+                        b = next(i for i in range(len(cum) - 1) if cum[i] <= q < cum[i + 1])
+                        local_i = q - cum[b]
+                        mask[0, 0, q, prefix_len + cum[b] : prefix_len + cum[b] + local_i + 1] = 0
+                    except StopIteration:
+                        mask[0, 0, q, prefix_len : prefix_len + q + 1] = 0
+                else:
+                    mask[0, 0, q, prefix_len : prefix_len + q + 1] = 0
+            cache_fuse_metadata["attn_bias"] = mask
+            # import pdb; pdb.set_trace()
+
+        if status in [3,4]:
+            attn_weights = torch.matmul(query.clone().transpose(0,1), key.clone().transpose(0,1).transpose(1,2).repeat_interleave(self.num_queries_per_kv, dim=0)).unsqueeze(0) / math.sqrt(self.head_size)
+            nq, nk = attn_weights.shape[2], attn_weights.shape[3]
+            # key = [prefix | suffix], prefix_len = nk - nq; 所有 q 都能看完整 prefix，suffix 部分对 q 做下三角因果
+            prefix_len = nk - nq
+            j_indices = torch.arange(nk, device=attn_weights.device)
+            i_indices = torch.arange(nq, device=attn_weights.device)
+            causal_mask = (j_indices.unsqueeze(0) <= (prefix_len + i_indices).unsqueeze(1)).bool()
+            attn_weights = attn_weights.masked_fill(~causal_mask, float('-inf'))
+            self.attention_weights = nn.functional.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query.dtype)
+
+
+
+        if kv_cache is not None :
+            key_cache, value_cache = PagedAttention.split_kv_cache(
+                kv_cache, self.num_kv_heads, self.head_size)
+            
+
+        if status in [5,1,2,3,4] or decide_skill:
+            num_prefill_tokens = attn_metadata.num_prefill_tokens
+            num_decode_tokens = attn_metadata.num_decode_tokens
+            output = torch.empty_like(query)
+            decode_query = None
+            query = query
+
+        else:
+            num_prefill_tokens = attn_metadata.num_prefill_tokens
+            num_decode_tokens = attn_metadata.num_decode_tokens
+            assert key.shape[0] == num_prefill_tokens + num_decode_tokens
+            assert value.shape[0] == num_prefill_tokens + num_decode_tokens
+
+            output = torch.empty_like(query)
+            # Query for decode. KV is not needed because it is already cached.
+            decode_query = query[num_prefill_tokens:]
+            # QKV for prefill.
+            query = query[:num_prefill_tokens]
+            key = key[:num_prefill_tokens]
+            value = value[:num_prefill_tokens]
+
+            assert query.shape[0] == num_prefill_tokens
+            assert decode_query.shape[0] == num_decode_tokens
+
+        if prefill_meta := attn_metadata.prefill_metadata:
+            # Prompt run. decide_skill 时 key 为 [prefix+skill]，必须走 xformers 分支
+            if kv_cache is None or prefill_meta.block_tables.numel() == 0 or decide_skill:
+                out = self._run_memory_efficient_xformers_forward(
+                    query, key, value, prefill_meta, status, cache_fuse_metadata)
+                
+                output = out
+            else:
+                out = PagedAttention.forward_prefix(
+                    query,
+                    key,
+                    value,
+                    key_cache,
+                    value_cache,
+                    prefill_meta.block_tables,
+                    prefill_meta.subquery_start_loc,
+                    prefill_meta.prompt_lens_tensor,
+                    prefill_meta.context_lens,
+                    prefill_meta.max_subquery_len,
+                    self.alibi_slopes,
+                )
+                assert output[:num_prefill_tokens].shape == out.shape
+                output[:num_prefill_tokens] = out
+
+        if decode_meta := attn_metadata.decode_metadata:
+            output[num_prefill_tokens:] = PagedAttention.forward_decode(
+                decode_query,
+                key_cache,
+                value_cache,
+                decode_meta.block_tables,
+                decode_meta.context_lens,
+                decode_meta.max_context_len,
+                attn_metadata.kv_cache_dtype,
+                self.num_kv_heads,
+                self.scale,
+                self.alibi_slopes,
+                kv_scale,
+            )
+
+        # Reshape the output tensor. contiguous() 避免 decide_skill 手动 attention 后 stride 不连续导致 view 报错
+        return output.contiguous().view(-1, self.num_heads * self.head_size)
+
+    def _run_memory_efficient_xformers_forward(
+        self,
+        query: torch.Tensor,
+        key: torch.Tensor,
+        value: torch.Tensor,
+        attn_metadata: XFormersMetadata,
+        status,
+        cache_fuse_metadata,
+    ) -> torch.Tensor:
+        """Attention for 1D query of multiple prompts. Multiple prompt
+        tokens are flattened in to `query` input.
+
+        See https://facebookresearch.github.io/xformers/components/ops.html
+        for API spec.
+
+        Args:
+            output: shape = [num_prefill_tokens, num_heads, head_size]
+            query: shape = [num_prefill_tokens, num_heads, head_size]
+            key: shape = [num_prefill_tokens, num_kv_heads, head_size]
+            value: shape = [num_prefill_tokens, num_kv_heads, head_size]
+            attn_metadata: Metadata for attention.
+        """
+        # decide_skill 时用自定义 mask，不依赖 prompt_lens
+        if not (decide_skill and isinstance(cache_fuse_metadata.get("attn_bias"), torch.Tensor)):
+            assert attn_metadata.prompt_lens is not None
+        original_query = query
+        if self.num_kv_heads != self.num_heads:
+            # GQA/MQA requires the shape [B, M, G, H, K].
+            # Note that the output also has the same shape (which is different
+            # from a spec from the doc).
+            query = query.view(query.shape[0], self.num_kv_heads,
+                               self.num_queries_per_kv, query.shape[-1])
+            key = key[:, :,
+                      None, :].expand(key.shape[0], self.num_kv_heads,
+                                      self.num_queries_per_kv, key.shape[-1])
+            value = value[:, :,
+                          None, :].expand(value.shape[0], self.num_kv_heads,
+                                          self.num_queries_per_kv,
+                                          value.shape[-1])
+        # Set attention bias if not provided. This typically happens at
+        # the very attention layer of every iteration.
+        # FIXME(woosuk): This is a hack.
+        if attn_metadata.attn_bias is None:
+            if self.alibi_slopes is None:
+                attn_metadata.attn_bias = BlockDiagonalCausalMask.from_seqlens(
+                                                attn_metadata.prompt_lens)
+                '''
+                attn_bias = BlockDiagonalCausalMask.from_seqlens(
+                    attn_metadata.prompt_lens)
+                if self.sliding_window is not None:
+                    attn_bias = attn_bias.make_local_attention(
+                        self.sliding_window)
+                attn_metadata.attn_bias = [attn_bias]
+                '''
+            else:
+                attn_metadata.attn_bias = _make_alibi_bias(
+                    self.alibi_slopes, self.num_kv_heads, query.dtype,
+                    attn_metadata.prompt_lens)
+        # import pdb; pdb.set_trace()
+
+
+
+
+        # No alibi slopes.
+        # TODO(woosuk): Too many view operations. Let's try to reduce
+        # them in the future for code readability.
+        # import pdb
+        # pdb.set_trace()
+        if self.alibi_slopes is None:
+            # Add the batch dimension.
+            query = query.unsqueeze(0)
+            key = key.unsqueeze(0)
+            value = value.unsqueeze(0)
+            
+            # decide_skill 时 attn_bias 是自定义 Tensor mask，xformers 不支持，用手动 attention
+            if decide_skill and isinstance(cache_fuse_metadata.get("attn_bias"), torch.Tensor):
+                # import pdb; pdb.set_trace()
+                mask = cache_fuse_metadata["attn_bias"]
+                # query (1, nq, M, G, H), key (1, nk, M, G, H) -> scores (1, nq, M, G, nk)
+                scores = torch.einsum('bqmgd,bkmgd->bqmgk', query, key).float() * self.scale
+                # mask (1, 1, nq, nk) -> (1, nq, 1, 1, nk) 以与 scores (1, nq, M, G, nk) 对齐
+                mask = mask.permute(0, 2, 1, 3).unsqueeze(3)
+                scores = scores + mask
+                attn = nn.functional.softmax(scores, dim=-1).to(query.dtype)
+                out = torch.einsum('bqmgk,bkmgd->bqmgd', attn, value).contiguous()
+            elif status in [5,1,2,3,4] or decide_skill:
+                out = xops.memory_efficient_attention_forward(
+                        query,
+                        key,
+                        value,
+                        attn_bias=cache_fuse_metadata["attn_bias"],
+                        p=0.0,
+                        scale=self.scale,
+                    )
+            else:
+                out = xops.memory_efficient_attention_forward(
+                query,
+                key,
+                value,
+                attn_bias=attn_metadata.attn_bias,
+                p=0.0,
+                scale=self.scale)
+            '''
+            out = xops.memory_efficient_attention_forward(
+                query,
+                key,
+                value,
+                attn_bias=attn_metadata.attn_bias[0],
+                p=0.0,
+                scale=self.scale)
+            '''
+            
+            return out.view_as(original_query)
+
+        # Attention with alibi slopes.
+        # FIXME(woosuk): Because xformers does not support dynamic sequence
+        # lengths with custom attention bias, we process each prompt one by
+        # one. This is inefficient, especially when we have many short prompts.
+        # import pdb
+        # pdb.set_trace()
+        output = torch.empty_like(original_query)
+        start = 0
+        for i, prompt_len in enumerate(attn_metadata.prompt_lens):
+            end = start + prompt_len
+            out = xops.memory_efficient_attention_forward(
+                query[None, start:end],
+                key[None, start:end],
+                value[None, start:end],
+                attn_bias=attn_metadata.attn_bias[i],
+                p=0.0,
+                scale=self.scale)
+            # TODO(woosuk): Unnecessary copy. Optimize.
+            output[start:end].copy_(out.view_as(original_query[start:end]))
+            start += prompt_len
+        return output
+
+
+def _make_alibi_bias(
+    alibi_slopes: torch.Tensor,
+    num_kv_heads: int,
+    dtype: torch.dtype,
+    prompt_lens: List[int],
+) -> LowerTriangularMaskWithTensorBias:
+    attn_biases = []
+    for prompt_len in prompt_lens:
+        bias = torch.arange(prompt_len, dtype=dtype)
+        # NOTE(zhuohan): HF uses
+        #     `bias = bias[None, :].repeat(prompt_len, 1)`
+        # here. We find that both biases give the same results, but
+        # the bias below more accurately follows the original ALiBi
+        # paper.
+        # Calculate a matrix where each element represents ith element- jth
+        # element.
+        bias = bias[None, :] - bias[:, None]
+
+        padded_len = (prompt_len + 7) // 8 * 8
+        num_heads = alibi_slopes.shape[0]
+        bias = torch.empty(
+            1,  # batch size
+            num_heads,
+            prompt_len,
+            padded_len,
+            device=alibi_slopes.device,
+            dtype=dtype,
+        )[:, :, :, :prompt_len].copy_(bias)
+        bias.mul_(alibi_slopes[:, None, None])
+        if num_heads != num_kv_heads:
+            bias = bias.unflatten(1, (num_kv_heads, num_heads // num_kv_heads))
+        attn_biases.append(LowerTriangularMaskWithTensorBias(bias))
+
+    return attn_biases
+
+def _make_partial_bias_gqa(cache_fuse_metadata, 
+                       device,
+                       num_kv_heads,
+                       num_queries_per_kv,):
+    seq_len = cache_fuse_metadata['org_seq_len']
+    padded_len = (seq_len + 7) // 8 * 8
+    dtype = cache_fuse_metadata['kv_cache_dtype']
+    imp_indices = cache_fuse_metadata['imp_indices']
+    attn_mask = torch.triu(torch.ones(padded_len,
+                                      padded_len,
+                                      dtype=dtype,
+                                      device=device),
+                           diagonal=1)
+    #FIXME(Jiayi): The first 1 (bsz) is a hack
+    attn_mask = (attn_mask * torch.finfo(dtype).min).view(1, 
+                                                          1, 1, padded_len, padded_len) #FIXME(Jiayi): Now only focus on bsz=1
+    attn_mask = attn_mask[:,:,:,imp_indices]
+    attn_mask = attn_mask.expand(1,
+                                 num_kv_heads,num_queries_per_kv,-1,-1)
+    #import pdb
+    #pdb.set_trace()
+    attn_mask_padded = torch.empty(
+        1,
+        num_kv_heads,
+        num_queries_per_kv,
+        len(imp_indices),
+        padded_len,
+        device=device,
+        dtype=dtype,
+    ).copy_(attn_mask)[:, :, :, :, :seq_len]
+    #attn_mask_padded = LowerTriangularMaskWithTensorBias(attn_mask_padded)
+    return attn_mask_padded
+
+def _fetch_maetrailized_mask_gqa(q_len,num_kv_heads,num_queries_per_kv,device,dtype):
+    seq_len = q_len
+    padded_len = (seq_len + 7) // 8 * 8
+    attn_mask = torch.triu(torch.ones(seq_len,
+                                      padded_len,
+                                      dtype=dtype,
+                                      device=device),
+                           diagonal=1)
+    #FIXME(Jiayi): The first 1 (bsz) is a hack
+    attn_mask = (attn_mask * torch.finfo(dtype).min).view(#1,
+                                                          1, 1, seq_len, padded_len) #FIXME(Jiayi): Now only focus on bsz=1
+    attn_mask = attn_mask.expand(#1,
+                                 num_kv_heads, num_queries_per_kv,-1,-1)
+    
+    attn_mask_padded = torch.empty(
+        #1,
+        num_kv_heads,
+        num_queries_per_kv,
+        seq_len,
+        padded_len,
+        device=device,
+        dtype=dtype,
+    ).copy_(attn_mask)[#:, 
+                       :, :, :, :seq_len]
+    #attn_mask_padded = LowerTriangularMaskWithTensorBias(attn_mask_padded)
+    return attn_mask_padded

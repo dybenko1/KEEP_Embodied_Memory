@@ -1,0 +1,917 @@
+=====================================
+hidden_state_length: 670
+kv_length: 794
+recompute_time_layer_0: 0.007154703140258789
+=====================================
+hidden_state_length: 670
+kv_length: 794
+recompute_time_layer_1: 0.0014185905456542969
+=====================================
+hidden_state_length: 649
+kv_length: 794
+recompute_time_layer_2: 0.0030591487884521484
+=====================================
+hidden_state_length: 649
+kv_length: 794
+recompute_time_layer_3: 0.0019330978393554688
+=====================================
+hidden_state_length: 625
+kv_length: 794
+recompute_time_layer_4: 0.0019030570983886719
+=====================================
+hidden_state_length: 625
+kv_length: 794
+recompute_time_layer_5: 0.0033082962036132812
+=====================================
+hidden_state_length: 625
+kv_length: 794
+recompute_time_layer_6: 0.0021200180053710938
+=====================================
+hidden_state_length: 602
+kv_length: 794
+recompute_time_layer_7: 0.003111124038696289
+=====================================
+hidden_state_length: 602
+kv_length: 794
+recompute_time_layer_8: 0.0027730464935302734
+=====================================
+hidden_state_length: 578
+kv_length: 794
+recompute_time_layer_9: 0.002146005630493164
+=====================================
+hidden_state_length: 578
+kv_length: 794
+recompute_time_layer_10: 0.002448558807373047
+=====================================
+hidden_state_length: 578
+kv_length: 794
+recompute_time_layer_11: 0.0022766590118408203
+=====================================
+hidden_state_length: 522
+kv_length: 794
+recompute_time_layer_12: 0.0018620491027832031
+=====================================
+hidden_state_length: 522
+kv_length: 794
+recompute_time_layer_13: 0.0017666816711425781
+=====================================
+hidden_state_length: 522
+kv_length: 794
+recompute_time_layer_14: 0.0017194747924804688
+=====================================
+hidden_state_length: 522
+kv_length: 794
+recompute_time_layer_15: 0.001722574234008789
+=====================================
+hidden_state_length: 410
+kv_length: 794
+recompute_time_layer_16: 0.002958536148071289
+=====================================
+hidden_state_length: 410
+kv_length: 794
+recompute_time_layer_17: 0.0025234222412109375
+=====================================
+hidden_state_length: 410
+kv_length: 794
+recompute_time_layer_18: 0.0028002262115478516
+=====================================
+hidden_state_length: 410
+kv_length: 794
+recompute_time_layer_19: 0.00260162353515625
+=====================================
+hidden_state_length: 353
+kv_length: 794
+kv_length: 794
+recompute_time_layer_21: 0.0017790794372558594
+=====================================
+hidden_state_length: 353
+kv_length: 794
+recompute_time_layer_22: 0.0015897750854492188
+=====================================
+hidden_state_length: 353
+kv_length: 794
+recompute_time_layer_23: 0.001608133316040039
+=====================================
+hidden_state_length: 353
+kv_length: 794
+recompute_time_layer_24: 0.0015959739685058594
+=====================================
+hidden_state_length: 353
+kv_length: 794
+recompute_time_layer_25: 0.001600503921508789
+=====================================
+hidden_state_length: 239
+kv_length: 794
+recompute_time_layer_26: 0.0014421939849853516
+=====================================
+hidden_state_length: 239
+kv_length: 794
+recompute_time_layer_27: 0.0013813972473144531
+=====================================
+hidden_state_length: 239
+kv_length: 794
+recompute_time_layer_28: 0.0014095306396484375
+=====================================
+hidden_state_length: 239
+kv_length: 794
+recompute_time_layer_29: 0.0023517608642578125
+=====================================
+hidden_state_length: 239
+kv_length: 794
+recompute_time_layer_30: 0.002166271209716797
+=====================================
+hidden_state_length: 239
+kv_length: 794
+recompute_time_layer_31: 0.0020291805267333984
+=====================================
+hidden_state_length: 239
+kv_length: 794
+recompute_time_layer_32: 0.001962423324584961
+=====================================
+hidden_state_length: 239
+kv_length: 794
+recompute_time_layer_33: 0.0018405914306640625
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_34: 0.001756429672241211
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_35: 0.002500772476196289
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_36: 0.002334117889404297
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_37: 0.0022537708282470703
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_38: 0.002162933349609375
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_39: 0.002086162567138672
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_40: 0.001963376998901367
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_41: 0.002657651901245117
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_42: 0.0024590492248535156
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_43: 0.0023345947265625
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_44: 0.0012898445129394531
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_45: 0.0014362335205078125
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_46: 0.0013628005981445312
+=====================================
+hidden_state_length: 127
+kv_length: 794
+recompute_time_layer_47: 0.0013561248779296875
+=====================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_0: 0.005506992340087891
+=====================================
+hidden_state_length: 500
+kv_length: 3800recompute_time_layer_1: 0.0014410018920898438
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_2: 0.0010874271392822266
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_3: 0.0010581016540527344
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_4: 0.0010797977447509766
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_0: 0.0011970996856689453
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_1: 0.0014677047729492188
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_2: 0.0010614395141601562
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_3: 0.0010590553283691406
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_4: 0.0011126995086669922
+2 =====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_0: 0.001291036605834961
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_1: 0.0011091232299804688
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_2: 0.0010402202606201172
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_3: 0.0010454654693603516
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_4: 0.001071929931640625
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_0: 0.0013260841369628906
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_1: 0.001119375228881836
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_2: 0.0010983943939208984
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_3: 0.0010347366333007812
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_4: 0.0010268688201904297
+4 =====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_0: 0.0015392303466796875
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_1: 0.0013637542724609375
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_2: 0.0013043880462646484
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_3: 0.0011734962463378906
+=====================================
+hidden_state_length: 500
+kv_length: 3800
+recompute_time_layer_4: 0.0011680126190185547
+
+  平均延迟: 503.81 ± 376.25 ms
+
+测试配置: prompt_length=1000, past_kv_length=2800
+  测试推理延迟... =====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_0: 0.0017459392547607422
+kv_length: 3800
+recompute_time_layer_2: 0.0011341571807861328
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_3: 0.0011479854583740234
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_4: 0.0011568069458007812
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_0: 0.0019383430480957031
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_1: 0.0012471675872802734
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_2: 0.0012273788452148438
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_3: 0.0011644363403320312
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_4: 0.0011718273162841797
+2 =====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_0: 0.0013997554779052734
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_1: 0.001165628433227539
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_2: 0.0011570453643798828
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_3: 0.0011317729949951172
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_4: 0.0011851787567138672
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_0: 0.0015294551849365234
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_1: 0.0013680458068847656
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_2: 0.0011539459228515625
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_3: 0.001150369644165039
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_4: 0.0011415481567382812
+4 =====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_0: 0.0014777183532714844
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_1: 0.0012438297271728516
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_2: 0.0011262893676757812
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_3: 0.0011157989501953125
+=====================================
+hidden_state_length: 1000
+kv_length: 3800
+recompute_time_layer_4: 0.0011174678802490234
+
+  平均延迟: 607.67 ± 0.82 ms
+
+测试配置: prompt_length=1500, past_kv_length=2300
+  测试推理延迟... =====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_0: 0.002271413803100586
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_1: 0.0011882781982421875
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_2: 0.0011315345764160156
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_3: 0.0011472702026367188
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_4: 0.0013301372528076172
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_0: 0.0013856887817382812
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_1: 0.0011022090911865234
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+kv_length: 3800
+recompute_time_layer_3: 0.0011641979217529297
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_4: 0.0011813640594482422
+2 =====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_0: 0.0014297962188720703
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_1: 0.0011696815490722656
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_2: 0.001148223876953125
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_3: 0.00128936767578125
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_4: 0.001341104507446289
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_0: 0.0014247894287109375
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_1: 0.001199483871459961
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_2: 0.0012404918670654297
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_3: 0.0011458396911621094
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_4: 0.0011472702026367188
+4 =====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_0: 0.0014977455139160156
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_1: 0.0011029243469238281
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_2: 0.00110626220703125
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_3: 0.0011510848999023438
+=====================================
+hidden_state_length: 1500
+kv_length: 3800
+recompute_time_layer_4: 0.0011420249938964844
+
+  平均延迟: 882.07 ± 1.90 ms
+
+测试配置: prompt_length=2000, past_kv_length=1800
+  测试推理延迟... =====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_0: 0.0018432140350341797
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_1: 0.0011794567108154297
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_2: 0.0011260509490966797
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_3: 0.0011293888092041016
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_4: 0.0011208057403564453
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_0: 0.0014328956604003906
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_1: 0.0011608600616455078
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_2: 0.0013644695281982422
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_3: 0.0014142990112304688
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_4: 0.001409292221069336
+2 =====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_0: 0.0019085407257080078
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_1: 0.0012063980102539062
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_2: 0.001402139663696289
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+kv_length: 3800
+recompute_time_layer_4: 0.0011570453643798828
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_0: 0.0014066696166992188
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_1: 0.0011522769927978516
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_2: 0.001149892807006836
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_3: 0.0011210441589355469
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_4: 0.0010755062103271484
+4 =====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_0: 0.0014872550964355469
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_1: 0.0011911392211914062
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_2: 0.0011014938354492188
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_3: 0.0011372566223144531
+=====================================
+hidden_state_length: 2000
+kv_length: 3800
+recompute_time_layer_4: 0.0011093616485595703
+
+  平均延迟: 1190.06 ± 1.96 ms
+
+测试配置: prompt_length=2500, past_kv_length=1300
+  测试推理延迟... =====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_0: 0.0019998550415039062
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_1: 0.001216888427734375
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_2: 0.0011255741119384766
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_3: 0.00110626220703125
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_4: 0.0011091232299804688
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_0: 0.0018825531005859375
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_1: 0.0012066364288330078
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_2: 0.0011696815490722656
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_3: 0.0011620521545410156
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_4: 0.0011756420135498047
+2 =====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_0: 0.0014183521270751953
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_1: 0.0012578964233398438
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_2: 0.0011401176452636719
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_3: 0.0011386871337890625
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_4: 0.0012178421020507812
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_0: 0.0016682147979736328
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_1: 0.0015039443969726562
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_2: 0.0014400482177734375
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_3: 0.0014081001281738281
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+kv_length: 3800
+recompute_time_layer_1: 0.0011141300201416016
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_2: 0.0011348724365234375
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_3: 0.001088857650756836
+=====================================
+hidden_state_length: 2500
+kv_length: 3800
+recompute_time_layer_4: 0.0011246204376220703
+
+  平均延迟: 1478.65 ± 2.35 ms
+
+测试配置: prompt_length=3000, past_kv_length=800
+  测试推理延迟... =====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_0: 0.0019235610961914062
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_1: 0.0012159347534179688
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_2: 0.001188039779663086
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_3: 0.0012104511260986328
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_4: 0.0011746883392333984
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_0: 0.001634359359741211
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_1: 0.0013422966003417969
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_2: 0.0011615753173828125
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_3: 0.0012416839599609375
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_4: 0.0011997222900390625
+2 =====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_0: 0.0014731884002685547
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_1: 0.001207590103149414
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_2: 0.0011591911315917969
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_3: 0.0011615753173828125
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_4: 0.0010974407196044922
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_0: 0.0015065670013427734
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_1: 0.0011875629425048828
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_2: 0.0011739730834960938
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_3: 0.001149892807006836
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_4: 0.0012021064758300781
+4 =====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_0: 0.0015535354614257812
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_1: 0.0012507438659667969
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_2: 0.0011878013610839844
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_3: 0.0011165142059326172
+=====================================
+hidden_state_length: 3000
+kv_length: 3800
+recompute_time_layer_4: 0.0011105537414550781
+
+  平均延迟: 1786.88 ± 3.22 ms
+
+测试配置: prompt_length=3800, past_kv_length=0
+  测试推理延迟... =====================================
+hidden_state_length: 3800
+kv_length: 3800
+kv_length: 3800
+recompute_time_layer_2: 0.001074075698852539
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_3: 0.0010502338409423828
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_4: 0.001049041748046875
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_0: 0.0013747215270996094
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_1: 0.0011639595031738281
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_2: 0.0011315345764160156
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_3: 0.0011150836944580078
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_4: 0.0011115074157714844
+2 =====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_0: 0.0014154911041259766
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_1: 0.0012006759643554688
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_2: 0.001186370849609375
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_3: 0.0011396408081054688
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_4: 0.0010914802551269531
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_0: 0.0014011859893798828
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_1: 0.0011298656463623047
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_2: 0.0011415481567382812
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_3: 0.0011186599731445312
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_4: 0.0011305809020996094
+4 =====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_0: 0.0014331340789794922
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_1: 0.0011758804321289062
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_2: 0.0012717247009277344
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_3: 0.0013468265533447266
+=====================================
+hidden_state_length: 3800
+kv_length: 3800
+recompute_time_layer_4: 0.0011348724365234375
