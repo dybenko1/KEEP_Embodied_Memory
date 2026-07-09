@@ -30,10 +30,10 @@ The two implementations require different environments. Please follow the setup 
 ## Citation
 If you find this work useful for your research, please cite our paper:
 ```bash
-@article{yang2025keep,
+@article{yang2026keep,
   title={KEEP: A KV-Cache-Centric Memory Management System for Efficient Embodied Planning},
   author={Yang, Zebin and Xie, Tong and Lu, Baotong and Liu, Shaoshan and Yu, Bo and Li, Meng},
   journal={arXiv preprint arXiv:2602.23592},
-  year={2025}
+  year={2026}
 }
 ```
