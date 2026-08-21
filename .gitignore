@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Hugging Face / model files
+.cache/
+huggingface/
+huggingface_cache/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+
+# Experiment outputs
+outputs/
+results/
+logs/
+checkpoints/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Temporary files
+*.log
+*.tmp
